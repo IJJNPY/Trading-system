@@ -34,46 +34,95 @@
                 </el-button>
             </el-form-item>
         </el-form>
-
     </div>
 </template>
 
 <script>
+    import {queryCaptcha,login} from "../api/loginApi";
+    import encryptMD5 from 'js-md5'
+
     export default {
-        name: "Login",
-        data(){
-          return{
-            //提交表单
-            ruleForm:{
-              uid:'',
-              password:'',
-              captcha:'',
-              captchaid:'',
-            },
-            //验证码图片
-            codeimg:'',
-            //限制规则
-            rules:{
-              uid:[{required:true,message:'Please enter your account',trigger:'blue'}],
-              password:[{required:true,message:'Please enter your password',trigger:'blue'}],
-              captcha:[{required:true,message:'Please enter your verification code',trigger:'blue'}]
-            },
-            //防止前端重复提交
-            logining:false
+      name: "Login",
+      data(){
+        return{
+          //提交表单
+          ruleForm:{
+            uid:'',
+            password:'',
+            captcha:'',
+            captchaid:'',
+          },
+          //验证码图片
+          codeimg:'',
+          //限制规则
+          rules:{
+            uid:[{required:true,message:'Please enter your account',trigger:'blue'}],
+            password:[{required:true,message:'Please enter your password',trigger:'blue'}],
+            captcha:[{required:true,message:'Please enter your verification code',trigger:'blue'}]
+          },
+          //防止前端重复提交
+          logining:false
+        }
+      },
+      created() {
+        this.getCode();
+      },
+      methods:{
+        //common.js(网络交互)<--logic.js(业务逻辑)<--vue
+
+        captchaCallback(code,msg,captchaData){
+          //保存图片id，图片id跟随登录表单一起传送到后台
+          this.ruleForm.captchaid = captchaData.id;
+          //将当前页面上展现的验证码
+          this.codeimg = captchaData.imageBase64;
+        },
+        loginCallback(code,msg,acc){
+          if(code == 2){
+            //登陆失败
+            this.$message.error(msg);
+            this.logining = false;
+            this.getCode();
+          }else{
+            //登录成功后做基础数据的保存 uid token
+            sessionStorage.setItem("uid",acc.uid);
+            sessionStorage.setItem("token",acc.token)
+            //显示上次成功登录的时间
+            if(acc.lastLoginDate.length > 1){
+              this.$message.success("登录成功，上次登录的时间:"+acc.lastLoginDate +" " +acc.lastLoginTime);
+            }else{
+              this.$message.success("登录成功");
+            }
+            //跳转主页面
+            setTimeout(()=>{
+              this.logining = false,
+                  this.$router.push({path:'/dashboard'})
+            },1000);
           }
         },
-        methods:{
-          //common.js(网络交互)<--logic.js(业务逻辑)<--vue
-
-          //验证码获取
-          getCode(){
-
-          },
-          //提交表单
-          submitForm(formName){
-
-          }
+        //验证码获取
+        getCode(){
+          queryCaptcha(this.captchaCallback)
+        },
+        //提交表单
+        submitForm(formName){
+          //拿到表单，并对限制逻辑进行校验
+          this.$refs[formName].validate(valid =>{
+            if(valid){
+              //校验通过，要让按钮不能重复点击
+              this.logining = true;
+              login({
+                uid: this.ruleForm.uid,
+                password: encryptMD5(this.ruleForm.password),
+                captcha: this.ruleForm.captcha,
+                captchaid: this.ruleForm.captchaid
+              },this.loginCallback);
+            }else{
+              this.$message.error('Username/Password/Verification code can not be empty')
+              this.logining =false;
+            }
+          })
         }
+      }
     }
 </script>
 

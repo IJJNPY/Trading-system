@@ -11,7 +11,7 @@ public class Hello {
     @Autowired
     private StringRedisTemplate template;
 
-    @RequestMapping("hello2")
+    @RequestMapping("/hello2")
     public String hello2(){
         template.opsForValue().set("test:Hello","World");
         return template.opsForValue().get("test:Hello");
