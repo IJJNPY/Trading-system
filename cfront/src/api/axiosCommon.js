@@ -1,3 +1,4 @@
+import router from '../router'
 //把一个js变量转化为url参数
 import Qs from 'qs';
 
@@ -11,21 +12,29 @@ import axios from 'axios';
 //params 请求这个服务需要的参数
 //callback 请求返回之后需要什么样的处理，回调函数
 export const reqRealEndAsync = (method,baseUrl,url,params,callback)=>{
+
+    console.log(Qs.stringify(params));
+
     //使用axios调用后台接口
     params.token = sessionStorage.getItem('token');
+
     return axios({
         timeout:5000,
-        baseUrl:baseUrl,
+        baseURL:baseUrl,
         method:method,
         url:url,
-        //http的消息头
+        // http的消息头
         headers:{
             'Content-type':'application/x-www-form-urlencoded',
         },
         data:Qs.stringify(params),
+
         //false --会对data进行深度序列化，后端需要对其进行序列化
         //true --List<String>在框架中可以直接拿到list
         traditional:true,
+        // transformRequest: [function (params) {
+        //     return Qs.stringify(params);
+        // }]
     }).then(res=>{
         let result = res.data;
         //code:0 -- success
@@ -52,7 +61,7 @@ export const reqRealEnd = (method,baseUrl,url,params)=>{
     params.token = sessionStorage.getItem('token');
     return axios({
         timeout:5000,
-        baseUrl:baseUrl,
+        baseURL:baseUrl,
         method:method,
         url:url,
         headers:{

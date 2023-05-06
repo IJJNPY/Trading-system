@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class CounterRes {
 
+    public static final int SUCCESS = 0;
+    public static final int RELOOGIN = 1;
+    public static final int FAIL = 2;
 
     private int code;
 

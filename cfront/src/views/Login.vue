@@ -24,7 +24,7 @@
                     </el-form-item>
                 </el-col>
 <!--                验证码图片-->
-                <el-col :span="12">
+                <el-col :span="12" style="text-align: right">
                     <img :src="codeimg" @click="getCode()"/>
                 </el-col>
             </el-row>
@@ -116,6 +116,7 @@
                 captcha: this.ruleForm.captcha,
                 captchaid: this.ruleForm.captchaid
               },this.loginCallback);
+
             }else{
               this.$message.error('Username/Password/Verification code can not be empty')
               this.logining =false;

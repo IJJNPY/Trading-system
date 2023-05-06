@@ -3,18 +3,19 @@ server:
 
 spring:
   datasource:
-    url: jdbc:sqllite:d:/test.db
+    url: jdbc:sqlite:D:/counter.db
+
     driver-class-name: org.sqlite.JDBC
   redis:
     host: 127.0.0.1
     port: 6379
     timeout: 6000ms
 
-#mybatis:
-#  mapperLocations: classpath:mapper/*.xml
-#mybatis-plus:
-#  configuration:
-#    jdbc-type-for-null: 'null'
+mybatis:
+  mapperLocations: classpath:mapper/*.xml
+mybatis-plus:
+  configuration:
+    jdbc-type-for-null: 'null'
 
 #缓存过期的时间
 cacheexpire:

@@ -1,5 +1,7 @@
 package com.gudy.counter.controller;
 
+import com.google.common.collect.ImmutableMap;
+import com.gudy.counter.bean.res.Account;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,15 +32,23 @@ public class DbUtil {
         dbUtil.setSqlSessionTemplate(this.sqlSessionTemplate);
     }
 
-    public static long getid(){
-        Long res = dbUtil.getSqlSessionTemplate().selectOne(
-                "testMapper.queryBalance"
+    //身份认证
+    public static Account queryAccount(long uid, String password){
+        return dbUtil.getSqlSessionTemplate().selectOne(
+                "userMapper.queryAccount",
+                ImmutableMap.of("UId",uid,"Password",password)
         );
-        if(res == null){
-            return -1;
-        }else {
-            return res;
-        }
+    }
+
+    public static void updateLoginTime(long uid, String nowDate, String nowTime){
+        dbUtil.getSqlSessionTemplate().update(
+                "userMapper.updateAccountLoginTime",
+                ImmutableMap.of(
+                        "UId",uid,
+                        "ModifyDate",nowDate,
+                        "ModifyTime",nowTime
+                )
+        );
     }
 
 }

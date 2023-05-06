@@ -28,6 +28,7 @@ public class Captcha {
         g.setColor(getRandColor(200,250));
         g.fillRect(0,0,width,height);
         Font font = new Font("Fixedsys", Font.BOLD, height-5);
+        g.setFont(font);
 
         //生成干扰线与噪点
         for(int i=0; i<lineCount; i++){
@@ -48,6 +49,14 @@ public class Captcha {
         
         //添加字符
         this.code = randomStr(codeCount);
+        int frontWidth = width/codeCount;
+        int frontHeight = height-5;
+        for(int i=0; i<codeCount; i++){
+            String str = this.code.substring(i,i+1);
+            g.setColor(getRandColor(1,255));
+            g.drawString(str,i*frontWidth+3,frontHeight-3);
+
+        }
 
         
     }
@@ -88,6 +97,6 @@ public class Captcha {
         String s = Base64.getEncoder().encodeToString(baos.toByteArray());
         s = s.replaceAll("\n","").replaceAll("\r","");
 
-        return "data:image/jpg:base64,"+s;
+        return "data:image/jpg;base64,"+s;
     }
 }
