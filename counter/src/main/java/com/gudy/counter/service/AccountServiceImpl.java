@@ -18,19 +18,25 @@ public class AccountServiceImpl implements AccountService {
     public Account login(long uid, String password, String captcha, String captchaId) throws Exception {
         //入参的合法性校验
         if(StringUtils.isAnyBlank(password,captcha,captchaId)){
+//            System.out.println("入参为空");
             return null;
         }
         //校验缓存验证码
         String captchaCache = RedisStringCache.get(captchaId, CacheType.CAPTCHA);
         if(StringUtils.isEmpty(captchaCache)){
+//            System.out.println("验证码为空");
             return null;
         }else if(!StringUtils.equalsAnyIgnoreCase(captcha,captchaCache)){
+//            System.out.println("验证码错误");
             return null;
         }
         RedisStringCache.remove(captchaId,CacheType.CAPTCHA);
         //比对数据库用户名和密码
+//        System.out.println(uid);
         Account account = DbUtil.queryAccount(uid,password);
+//        System.out.println(account);
         if(account == null){
+//            System.out.println("账户错误");
             return null;
         }else{
             //增加唯一ID作为身份标志
@@ -65,5 +71,11 @@ public class AccountServiceImpl implements AccountService {
         }else{
             return false;
         }
+    }
+
+    @Override
+    public boolean logout(String token) {
+        RedisStringCache.remove(token,CacheType.ACCOUNT);
+        return true;
     }
 }

@@ -65,6 +65,11 @@
         }
       },
       created() {
+
+        if(Boolean(this.$route.query.msg)){
+            this.$message.info(this.$route.query.msg+"")
+        }
+
         this.getCode();
       },
       methods:{

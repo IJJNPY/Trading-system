@@ -33,6 +33,8 @@
 </template>
 <script>
 
+    import {logout} from "@/api/loginApi";
+
     export default {
         data() {
             return {
@@ -52,7 +54,7 @@
             handleCommand(command) {
                 if (command == 'loginout') {
                     //TODO logout
-                    // logout();
+                    logout();
                 }
             },
             // 侧边栏折叠

@@ -36,6 +36,8 @@ export const reqRealEndAsync = (method,baseUrl,url,params,callback)=>{
         //     return Qs.stringify(params);
         // }]
     }).then(res=>{
+        console.log(res)
+        console.log("out")
         let result = res.data;
         //code:0 -- success
         if(result.code == 1){
@@ -49,6 +51,10 @@ export const reqRealEndAsync = (method,baseUrl,url,params,callback)=>{
         }else if(result.code ==0){
             if(callback!=undefined){
                 callback(result.code,result.message,result.data);
+            }
+        }else if(result.code == 2){
+            if(callback!=undefined){
+                callback(result.code,result.message,result.data)
             }
         }else{
             console.error(result);

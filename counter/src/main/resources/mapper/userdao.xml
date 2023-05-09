@@ -29,5 +29,4 @@
         where uid = #{UId}
              and password=#{OldPwd}
     </update>
-
 </mapper>

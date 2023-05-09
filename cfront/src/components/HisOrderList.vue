@@ -5,9 +5,8 @@
         <div class="handle-box">
             <el-row>
                 <el-col :span="5">
-                    <code-input/>
+                    <code-input style="float: left"/>
                 </el-col>
-                <el-col :span="12">
                   <div style="float: left;margin-left: 10px">
                     <el-date-picker
                         size="small"
@@ -24,7 +23,6 @@
                         v-model="query.endDate"
                         value-format="yyyyMMdd"/>
                   </div>
-                </el-col>
 
               <el-col :span="2">
                 <el-button style="float: left" size="small" type="primary" icon="el-icon-search"

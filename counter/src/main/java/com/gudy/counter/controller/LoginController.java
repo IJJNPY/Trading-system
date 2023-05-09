@@ -45,7 +45,7 @@ public class LoginController {
         Account account = accountService.login(uid,password,captcha,captchaid);
 
         if(account == null){
-            return new CounterRes(CounterRes.FAIL,"Login failed",null);
+            return new CounterRes(CounterRes.FAIL,"Login failed,username/password/captcha incorrect",null);
         }else{
             return new CounterRes(account);
         }
@@ -53,7 +53,13 @@ public class LoginController {
 
     @RequestMapping("/loginfail")
     public CounterRes loginFail(){
-        return new CounterRes(CounterRes.RELOOGIN,"Please Login again",null);
+        return new CounterRes(CounterRes.RELOGIN,"Please Login again",null);
+    }
+
+    @RequestMapping("/logout")
+    public CounterRes logout(@RequestParam String token){
+        accountService.logout(token);
+        return new CounterRes(CounterRes.SUCCESS,"退出成功",null);
     }
 
 }
