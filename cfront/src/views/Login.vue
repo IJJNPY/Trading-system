@@ -40,6 +40,7 @@
 <script>
     import {queryCaptcha,login} from "../api/loginApi";
     import encryptMD5 from 'js-md5'
+    import {queryBalance, queryOrder, queryPosi, queryTrade} from "@/api/orderApi";
 
     export default {
       name: "Login",
@@ -100,7 +101,12 @@
             //跳转主页面
             setTimeout(()=>{
               this.logining = false,
-                  this.$router.push({path:'/dashboard'})
+                  this.$router.push({path:'/dashboard'}),
+                  //成交 委托 持仓查询
+                  queryBalance();
+                  queryOrder();
+                  queryTrade();
+                  queryPosi();
             },1000);
           }
         },

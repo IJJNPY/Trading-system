@@ -23,7 +23,7 @@ public class SessionCheckFilter implements Filter {
     private AccountService accountService;
 
     private Set<String> whiteRootPaths = Sets.newHashSet(
-            "login","msgsocket","test"
+            "login","msgsocket","test","api"
     );
 
     @Override

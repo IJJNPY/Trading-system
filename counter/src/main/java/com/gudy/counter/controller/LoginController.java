@@ -54,6 +54,7 @@ public class LoginController {
     @RequestMapping("/loginfail")
     public CounterRes loginFail(){
         return new CounterRes(CounterRes.RELOGIN,"Please Login again",null);
+
     }
 
     @RequestMapping("/logout")

@@ -13,7 +13,7 @@ import axios from 'axios';
 //callback 请求返回之后需要什么样的处理，回调函数
 export const reqRealEndAsync = (method,baseUrl,url,params,callback)=>{
 
-    console.log(Qs.stringify(params));
+    // console.log(Qs.stringify(params));
 
     //使用axios调用后台接口
     params.token = sessionStorage.getItem('token');
@@ -36,8 +36,8 @@ export const reqRealEndAsync = (method,baseUrl,url,params,callback)=>{
         //     return Qs.stringify(params);
         // }]
     }).then(res=>{
-        console.log(res)
-        console.log("out")
+        // console.log(res)
+        // console.log("out")
         let result = res.data;
         //code:0 -- success
         if(result.code == 1){
