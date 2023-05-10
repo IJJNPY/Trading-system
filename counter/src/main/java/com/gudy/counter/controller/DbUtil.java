@@ -51,5 +51,15 @@ public class DbUtil {
         );
     }
 
+    //修改密码
+    public static int updatePwd(long uid,String oldPwd,String newPwd){
+        return dbUtil.getSqlSessionTemplate().update(
+                "userMapper.updatePwd",
+                ImmutableMap.of(
+                        "UId",uid,
+                        "NewPwd",newPwd,
+                        "OldPwd",oldPwd));
+    }
+
 
 }

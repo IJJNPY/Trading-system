@@ -62,4 +62,16 @@ public class LoginController {
         return new CounterRes(CounterRes.SUCCESS,"退出成功",null);
     }
 
+    @RequestMapping("/pwdupdate")
+    public CounterRes pwdUpdate(@RequestParam int uid,
+                                @RequestParam String oldpwd,
+                                @RequestParam String newpwd){
+        boolean res = accountService.updatePwd(uid,oldpwd,newpwd);
+        if(res){
+            return new CounterRes(CounterRes.SUCCESS,"密码更新成功",null);
+        }else {
+            return new CounterRes(CounterRes.FAIL,"旧密码输入错误",null);
+        }
+    }
+
 }

@@ -18,7 +18,7 @@
                         <el-input :type="'password'" v-model="form.newpasswordcfm"/>
                     </el-form-item>
                     <el-form-item>
-                        <el-button style="float: right" size="small" type="primary">确认修改</el-button>
+                        <el-button style="float: right" size="small" type="primary" @click="onSubmit">确认修改</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
@@ -27,6 +27,9 @@
 </template>
 
 <script>
+    import {pwdUpdate,logout} from "@/api/loginApi";
+    import encryptMD5 from "js-md5";
+
     export default {
         name: "PwdSetting",
         data() {
@@ -38,6 +41,31 @@
                 }
             };
         },
+        methods:{
+          logoutCallback(code,msg,data){
+            if(code!=0){
+              this.$message.error(msg)
+            }else{
+              logout();
+            }
+          },
+          onSubmit(){
+            //校验两次输入的密码是否一致
+            if(this.form.newpassword!=this.form.newpasswordcfm){
+              this.$message.warning("两次密码输入不一致，请重新输入");
+              return;
+            }
+            if(this.form.newpassword.length<6){
+              this.$message.warning("密码长度太短，请重新输入");
+              return;
+            }
+            pwdUpdate({
+              uid:sessionStorage.getItem("uid"),
+              oldpwd:encryptMD5(this.form.oldpassword),
+              newpwd:encryptMD5(this.form.newpassword)
+            },this.logoutCallback)
+          }
+        }
     }
 </script>
 

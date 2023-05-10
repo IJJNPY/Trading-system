@@ -78,4 +78,10 @@ public class AccountServiceImpl implements AccountService {
         RedisStringCache.remove(token,CacheType.ACCOUNT);
         return true;
     }
+
+    @Override
+    public boolean updatePwd(long uid, String oldPwd, String newPwd) {
+        int res = DbUtil.updatePwd(uid,oldPwd,newPwd);
+        return res == 0?false:true;
+    }
 }

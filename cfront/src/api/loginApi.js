@@ -29,3 +29,9 @@ export const logout=()=>{
     //通知柜台已经退出
     reqRealEnd("post",config.real_domain,'/login/logout',{});
 }
+
+//修改密码
+export const pwdUpdate = (params,callback) =>{
+    return reqRealEndAsync("post",config.real_domain,
+        '/login/pwdupdate',params,callback);
+}

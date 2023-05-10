@@ -14,4 +14,7 @@ public interface AccountService {
 
     //推出登录接口
     boolean logout(String token);
+
+    //更改密码
+    boolean updatePwd(long uid, String oldPwd, String newPwd);
 }
