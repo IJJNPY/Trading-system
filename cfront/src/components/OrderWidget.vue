@@ -18,6 +18,7 @@
             </el-form-item>
             <el-form-item label="价格">
                 <el-input-number v-model="price" controls-position="right"
+                                 @change = "handlePrice"
                                  :step="0.01"
                                  :min="0.01"/>
             </el-form-item>
@@ -27,7 +28,8 @@
             </el-form-item>
 
             <el-form-item>
-                <el-button :type="direction === 0 ? 'danger' : 'success'" style="float: right" >
+                <el-button :type="direction === 0 ? 'danger' : 'success'" style="float: right"
+                           @click="onOrder">
                     {{direction === 0 ? '买入' : '卖出'}}
                 </el-button>
             </el-form-item>
@@ -38,6 +40,9 @@
 <script>
 
     import CodeInput from "./CodeInput";
+    import {sendOrder} from "@/api/orderApi";
+    import {constants} from "@/api/constants";
+    import * as moment from 'moment'
 
     export default {
         name: "OrderWidget",
@@ -55,6 +60,22 @@
             direction: {type: Number, required: true},
         },
         methods: {
+            handlePrice(){
+              if(this.direction === constants.SELL){
+                let posiArr = this.$store.state.posiData;
+                for(let i=0, leng=posiArr.length; i<leng; i++){
+                  if(posiArr[i].code == this.code){
+                    this.affordCount = posiArr[i].count;
+                  }
+                }
+              }else{
+                this.affordCount = parseInt(
+                    (this.$store.state.balanceData/constants.MULTI_FACTOR)
+                    /this.price
+                );
+                console.log(this.affordCount)
+              }
+            },
             updateSelectCode(item) {
                 this.code = item.code;
                 this.name = item.name;
@@ -70,6 +91,25 @@
                 //     }
                 // }
             },
+            handleOrderRes(code,msg,data){
+              if(code === 0){
+                this.$message.success("委托送往交易所")
+              }else{
+                this.$message.error("委托失败："+ msg)
+              }
+            },
+            onOrder(){
+              sendOrder({
+                uid:sessionStorage.getItem("uid"),
+                type:constants.NEW_ORDER,
+                timestamp: moment.now(),
+                code:this.code,
+                direction: this.direction,
+                price: this.price*constants.MULTI_FACTOR,
+                volume: this.volume,
+                ordertype: constants.LIMIT
+              },this.handleOrderRes)
+            }
 
         },
         created() {

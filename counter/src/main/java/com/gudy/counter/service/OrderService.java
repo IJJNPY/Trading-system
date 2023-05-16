@@ -16,4 +16,7 @@ public interface OrderService {
     List<OrderInfo> getOrderList(long uid);
     //查成交
     List<TradeInfo> getTradeList(long uid);
+
+    boolean sendOrder(long uid,short type,long timestamp,
+                      int code,byte direction,long price,long volume,byte ordertype);
 }

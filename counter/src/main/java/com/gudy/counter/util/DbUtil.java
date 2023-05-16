@@ -2,12 +2,15 @@ package com.gudy.counter.util;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.gudy.counter.bean.res.Account;
 import com.gudy.counter.bean.res.OrderInfo;
 import com.gudy.counter.bean.res.PosiInfo;
 import com.gudy.counter.bean.res.TradeInfo;
 import com.gudy.counter.cache.CacheType;
 import com.gudy.counter.cache.RedisStringCache;
+import com.gudy.counter.thirdpart.order.OrderCmd;
+import com.gudy.counter.thirdpart.order.OrderStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class DbUtil {
@@ -146,6 +150,37 @@ public class DbUtil {
             //3.查到
             return JsonUtil.fromJsonArr(tradeS,TradeInfo.class);
         }
+    }
+    //订单处理类
+    public static int saveOrder(OrderCmd ordercmd){
+        Map<String,Object> param = Maps.newHashMap();
+        param.put("UId",ordercmd.uid);
+        param.put("Code",ordercmd.code);
+        param.put("Direction",ordercmd.direction.getDirection());
+        param.put("Type",ordercmd.orderType.getType());
+        param.put("Price",ordercmd.price);
+        param.put("OCount",ordercmd.volume);
+        param.put("TCount",0);
+        param.put("Status", OrderStatus.NOT_SET.getCode());
+
+        param.put("Data",TimeformatUtil.yyyyMMdd(ordercmd.timestamp));
+        param.put("Time",TimeformatUtil.hhMMss(ordercmd.timestamp));
+
+        int count = dbUtil.getSqlSessionTemplate().insert(
+                "orderMapper.saveOrder",param
+        );
+        //判断是否成功
+        if(count>0){
+            return Integer.parseInt(param.get("ID").toString());
+        }else{
+            return -1;
+        }
+    }
+
+    //股票信息查询
+    public static List<Map<String,Object>> queryAllStockInfo(){
+        return dbUtil.getSqlSessionTemplate()
+                .selectList("stockMapper.queryStock");
     }
 
 
