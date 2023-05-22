@@ -3,7 +3,7 @@ package com.gudy.counter.service;
 import com.gudy.counter.bean.res.Account;
 import com.gudy.counter.cache.CacheType;
 import com.gudy.counter.cache.RedisStringCache;
-import com.gudy.counter.thirdpart.uuid.GudyUuid;
+import thirdpart.uuid.GudyUuid;
 import com.gudy.counter.util.DbUtil;
 import com.gudy.counter.util.JsonUtil;
 import com.gudy.counter.util.TimeformatUtil;

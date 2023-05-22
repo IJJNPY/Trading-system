@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<gateway>
+
+    <id>1001</id>
+
+    <recvport>8082</recvport>
+
+</gateway>

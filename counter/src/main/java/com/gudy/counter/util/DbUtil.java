@@ -9,8 +9,8 @@ import com.gudy.counter.bean.res.PosiInfo;
 import com.gudy.counter.bean.res.TradeInfo;
 import com.gudy.counter.cache.CacheType;
 import com.gudy.counter.cache.RedisStringCache;
-import com.gudy.counter.thirdpart.order.OrderCmd;
-import com.gudy.counter.thirdpart.order.OrderStatus;
+import thirdpart.order.OrderCmd;
+import thirdpart.order.OrderStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,6 +86,15 @@ public class DbUtil {
         }
     }
 
+    public static void addBalance(long uid,long balance){
+        dbUtil.getSqlSessionTemplate().update("orderMapper.updateBalance",
+                ImmutableMap.of("UId", uid, "Balance", balance));
+    }
+
+    public static void minusBalance(long uid,long balance){
+        addBalance(uid, -balance);
+    }
+
     //持仓类，由于需要频繁查询，所以将数据存入缓存来缓解数据库的压力
     public static List<PosiInfo> getPosiList(long uid){
         //1.查缓存
@@ -107,6 +116,48 @@ public class DbUtil {
             return JsonUtil.fromJsonArr(posiS,PosiInfo.class);
         }
     }
+    public static PosiInfo getPosi(long uid,int code){
+        return dbUtil.getSqlSessionTemplate().selectOne(
+                "orderMapper.queryPosi",
+                ImmutableMap.of("UId",uid,"Code",code));
+    }
+
+    public static void addPosi(long uid,int code,long volume,long price){
+        //持仓是否存在
+        PosiInfo posiInfo = getPosi(uid,code);
+        if(posiInfo == null){
+            //新增一条持仓
+            insertPosi(uid,code,volume,price);
+        }else {
+            //修改持仓
+            posiInfo.setCount(posiInfo.getCount()+volume);
+            posiInfo.setCost(posiInfo.getCost()+price*volume);
+            updatePosi(posiInfo);
+        }
+    }
+
+    public static void minusPosi(long uid,int code,long volume,long price){
+        addPosi(uid,code,-volume,price);
+    }
+
+    private static void insertPosi(long uid,int code,long volume,long price){
+        dbUtil.getSqlSessionTemplate().insert("orderMapper.insertPosi",
+                ImmutableMap.of("UId",uid,
+                "Code",code,
+                "Count",volume,
+                "Cost",volume*price));
+    }
+
+    private static void updatePosi(PosiInfo posiInfo){
+        dbUtil.getSqlSessionTemplate().insert("orderMapper.updatePosi",
+                ImmutableMap.of("UId",posiInfo.getUid(),
+                        "Code",posiInfo.getCode(),
+                        "Count",posiInfo.getCount(),
+                        "Cost",posiInfo.getCost())
+        );
+    }
+
+
 
     //委托类
     public static List<OrderInfo> getOrderList(long uid){

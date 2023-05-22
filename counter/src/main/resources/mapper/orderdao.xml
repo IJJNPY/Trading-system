@@ -9,6 +9,11 @@
         where t.uid = #{UId,jdbcType=BIGINT}
     </select>
 
+    <update id="updateBalance" parameterType="Map">
+        update t_user set balance = balance + #{Balance,jdbcType=BIGINT}
+        where uid = #{UId,jdbcType=BIGINT}
+    </update>
+
     <!-- 持仓类-->
     <select id="queryPosi"
             resultType="com.gudy.counter.bean.res.PosiInfo">
@@ -22,8 +27,24 @@
         from t_posi t,
         t_stock s
         where t.uid = #{UId,jdbcType=BIGINT}
+            <if test="Code!=null and Code!=''">
+                and t.code = #{Code,jdbcType=INTEGER}
+            </if>
             and t.code = s.code
     </select>
+
+    <update id="updatePosi" parameterType="Map">
+        update t_posi
+            set count = #{Count,jdbcType=BIGINT},
+                cost = #{Cost,jdbcType=BIGINT}
+            where uid = #{UId,jdbcType=BIGINT}
+              and code = #{Code,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertPosi" parameterType="Map">
+        insert into
+            t_posi(uid,code,cost,count)values(#{UId},#{Code},#{Cost},#{Count})
+    </insert>
 
     <!-- 委托类-->
     <select id="queryOrder"
