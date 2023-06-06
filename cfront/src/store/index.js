@@ -8,7 +8,7 @@ export default new Vuex.Store({
     posiData:[],
     orderData:[],
     tradeData:[],
-    balanceData:[],
+    balanceData: '',
   },
   mutations: {
 

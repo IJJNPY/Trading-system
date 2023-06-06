@@ -5,6 +5,7 @@
       <list>
         <option value="$PROJECT_DIR$/counter/pom.xml" />
         <option value="$PROJECT_DIR$/gateway/pom.xml" />
+        <option value="$PROJECT_DIR$/seq/pom.xml" />
       </list>
     </option>
   </component>

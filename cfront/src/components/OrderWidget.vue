@@ -40,9 +40,10 @@
 <script>
 
     import CodeInput from "./CodeInput";
-    import {sendOrder} from "@/api/orderApi";
+    import {queryBalance, queryPosi, sendOrder} from "@/api/orderApi";
     import {constants} from "@/api/constants";
     import * as moment from 'moment'
+    import PosiList from "@/components/PosiList";
 
     export default {
         name: "OrderWidget",
@@ -73,7 +74,6 @@
                     (this.$store.state.balanceData/constants.MULTI_FACTOR)
                     /this.price
                 );
-                console.log(this.affordCount)
               }
             },
             updateSelectCode(item) {
@@ -109,6 +109,8 @@
                 volume: this.volume,
                 ordertype: constants.LIMIT
               },this.handleOrderRes)
+              PosiList.methods.queryRefresh()
+              this.handlePrice()
             }
 
         },

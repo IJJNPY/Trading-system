@@ -9,12 +9,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="gateway" />
+        <module name="seq" />
         <module name="counter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="counter" target="8" />
+      <module name="counter" target="1.8" />
       <module name="gateway" target="1.8" />
+      <module name="seq" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">

@@ -73,6 +73,7 @@
             queryRefresh(){
               queryPosi();
               queryBalance();
+              console.log("3")
             },
             //成本转换器
             costFormatter(row,column){

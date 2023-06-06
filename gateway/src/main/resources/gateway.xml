@@ -6,4 +6,6 @@
 
     <recvport>8082</recvport>
 
+    <fetchservport>8890</fetchservport>
+
 </gateway>

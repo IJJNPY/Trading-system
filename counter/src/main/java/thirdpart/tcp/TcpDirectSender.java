@@ -43,6 +43,7 @@ public class TcpDirectSender {
                         &&socket !=null){
                         log.info("before send");
                         socket.write(msgBuffer);
+                        log.info("after send");
                     }
                 }catch (Exception e){
                     log.error("msg send fail, continue");
