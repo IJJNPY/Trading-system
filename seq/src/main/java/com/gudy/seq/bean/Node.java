@@ -21,6 +21,7 @@ public class Node {
     @Getter
     private RheaKVStore rheaKVStore;
 
+    //用来表示是否为leader节点
     private final AtomicLong leaderTerm = new AtomicLong(-1);
 
     //是否为leader节点

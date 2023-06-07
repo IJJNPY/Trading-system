@@ -9,6 +9,7 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.logging.log4j.core.config.Order;
 import thirdpart.fetchsurv.IFetchService;
 import thirdpart.order.OrderCmd;
+import thirdpart.order.OrderDirection;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class FetchTask extends TimerTask {
         if(MapUtils.isEmpty(fetchServiceMap)){
             return;
         }
+
         //获取数据
         List<OrderCmd> cmds = collectAllOrders(fetchServiceMap);
         if(CollectionUtils.isEmpty(cmds)){
@@ -40,8 +42,57 @@ public class FetchTask extends TimerTask {
         }
         log.info(cmds);
 
-        //TODO 对数据进行排序
+        //排序 时间优先 价格优先 量优先
+        cmds.sort((o1,o2)->{
+            int res = compareTime(o1,o2);
+            if(res!=0){
+                return res;
+            }
+            res = comparePrice(o1,o2);
+            if(res!=0){
+                return res;
+            }
+            res = compareVolume(o1,o2);
+            return res;
 
+        });
+
+        //存储到KV Store， 发送到撮合核心
+
+
+    }
+
+    private int compareVolume(OrderCmd o1, OrderCmd o2) {
+        if(o1.volume > o2.volume){
+            return -1;
+        }else if(o1.volume < o2.volume){
+            return 1;
+        }else {
+            return 0;
+        }
+    }
+
+    private int comparePrice(OrderCmd o1, OrderCmd o2) {
+        if(o1.direction == o2.direction){
+            if(o1.price > o2.price){
+                return o1.direction == OrderDirection.BUY?-1:1;
+            }else if(o1.price < o2.price){
+                return o1.direction == OrderDirection.BUY?1:-1;
+            }else {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    private int compareTime(OrderCmd o1, OrderCmd o2) {
+        if(o1.timestamp > o2.timestamp){
+            return 1;
+        }else if(o1.timestamp < o2.timestamp){
+            return -1;
+        }else {
+            return 0;
+        }
     }
 
     private List<OrderCmd> collectAllOrders(Map<String, IFetchService> fetchServiceMap) {

@@ -113,13 +113,16 @@ public class SeqConfig {
 
     //启动KV Store
     private void startSeqDbCluster(){
+        //为一个集群中有多个raft集群的情况使用
         final PlacementDriverOptions pdOpts = PlacementDriverOptionsConfigured.newConfigured()
+                //这里只有一个raft集群，参数传入true书名pdopts不生效
                 .withFake(true)
                 .config();
 
         //127.0.0.1：8891
         String[] split = serveUrl.split(":");
         final StoreEngineOptions storeOpts = StoreEngineOptionsConfigured.newConfigured()
+                //数据存储类型用内存的方式来存储的
                 .withStorageType(StorageType.Memory)
                 .withMemoryDBOptions(MemoryDBOptionsConfigured.newConfigured().config())
                 .withRaftDataPath(dataPath)
@@ -127,6 +130,7 @@ public class SeqConfig {
                 .withServerAddress(new Endpoint(split[0],Integer.parseInt(split[1])))
                 .config();
 
+        //kv的option依赖于 pdopts以及storeopts，因此需要将他们提前定义出来
         final RheaKVStoreOptions opts = RheaKVStoreOptionsConfigured.newConfigured()
                 .withInitialServerList(serveList)
                 .withStoreEngineOptions(storeOpts)
@@ -135,6 +139,7 @@ public class SeqConfig {
 
         node = new Node(opts);
         node.start();
+        //把节点的stop方法挂到系统的shutdown流程当中去
         Runtime.getRuntime().addShutdownHook(new Thread(node::stop));
         log.info("start seq node success on port{}",split[1]);
     }
