@@ -34,6 +34,14 @@ public class TcpDirectSender {
     public void startup(){
         vertx.createNetClient().connect(port,ip,new ClientConnHandler());
 
+//        vertx.createNetClient().connect(port,ip,conn->{
+//            if(conn.succeeded()){
+//                System.out.println("success");
+//            }else {
+//                System.out.println("failed");
+//            }
+//        });
+
         new Thread(()->{
             while (true){
                 try {
@@ -61,8 +69,9 @@ public class TcpDirectSender {
 
     private class ClientConnHandler implements Handler<AsyncResult<NetSocket>>{
 
+
         private void reconnect(){
-            vertx.setTimer(1000*5,r->{
+            vertx.setTimer(1000*2,r->{
                 log.info("try reconnect to server to {}:{} failed", ip, port);
                 vertx.createNetClient()
                         .connect(port,ip,new ClientConnHandler());
@@ -84,7 +93,8 @@ public class TcpDirectSender {
                     log.error("error exist", ex.getCause());
                 });
             }else{
-
+                log.info("failed to connect to remote {}:{}",ip,port);
+                reconnect();
             }
 
 

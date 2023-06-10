@@ -8,13 +8,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="counter" />
+        <module name="engine" />
         <module name="gateway" />
         <module name="seq" />
-        <module name="counter" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="counter" target="1.8" />
+      <module name="engine" target="1.8" />
       <module name="gateway" target="1.8" />
       <module name="seq" target="1.8" />
     </bytecodeTargetLevel>

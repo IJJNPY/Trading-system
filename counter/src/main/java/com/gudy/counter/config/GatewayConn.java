@@ -31,7 +31,9 @@ public class GatewayConn {
     public void sendOrder(OrderCmd orderCmd){
         byte[] data = null;
         try{
+
             data = config.getBodyCodec().serialize(orderCmd);
+
         }catch (Exception e){
             log.error("encode error for ordercmd:{}",orderCmd,e);
             return;

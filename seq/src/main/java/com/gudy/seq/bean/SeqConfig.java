@@ -14,6 +14,9 @@ import com.alipay.sofa.rpc.listener.ChannelListener;
 import com.alipay.sofa.rpc.transport.AbstractChannel;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.vertx.core.Vertx;
+import io.vertx.core.datagram.DatagramSocket;
+import io.vertx.core.datagram.DatagramSocketOptions;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -41,17 +44,40 @@ public class SeqConfig {
     @NonNull
     private String fileName;
 
+
     public void startup() throws Exception{
         //1.读取配置文件
         initConfig();
+
         //2.初始化集群
         startSeqDbCluster();
-        //TODO 3.启动下游广播
+
+        //TODO3.启动下游广播
+        startMultiCast();
 
         //4.初始化网关连接
         startupFetch();
     }
-    /////////////////////抓取逻辑//////////////////////////
+
+
+    /////////////////////广播/////////////////////////////
+
+    @Getter
+    private String multicastIp;
+
+    @Getter
+    private int multicastPort;
+
+    @Getter
+    private DatagramSocket multicastSender;
+
+    private void startMultiCast(){
+        multicastSender = Vertx.vertx().createDatagramSocket(new DatagramSocketOptions());
+    }
+
+
+
+    ///////////////////////抓取逻辑//////////////////////////
     private String fetchurls;
 
     @ToString.Exclude
@@ -152,6 +178,8 @@ public class SeqConfig {
         serveUrl = properties.getProperty("serveurl");
         serveList = properties.getProperty("serverlist");
         fetchurls = properties.getProperty("fetchurl");
+        multicastIp = properties.getProperty("multicastip");
+        multicastPort = Integer.parseInt(properties.getProperty("multicastport"));
 
         log.info("read config: {}",this);
     }

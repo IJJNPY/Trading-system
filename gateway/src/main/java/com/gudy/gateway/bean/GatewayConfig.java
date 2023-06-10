@@ -60,7 +60,7 @@ public class GatewayConfig {
         fetchServPort = Integer.parseInt(root.element("fetchservport").getText());
         log.info("GateWay ID:{},Port:{},FetchServPort:{}",id,recvPort,fetchServPort);
 
-        //TODO数据库连接 柜台连接列表
+        //TODO 数据库连接 柜台连接列表
 
     }
 
