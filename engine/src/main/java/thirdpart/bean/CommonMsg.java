@@ -32,7 +32,6 @@ public class CommonMsg implements Serializable {
 
     private long msgNo;
 
-    @ToString.Exclude
     private byte[] body;
 
 

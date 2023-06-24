@@ -1,5 +1,6 @@
 package com.gudy.engine.bean;
 
+import com.alipay.disruptor.RingBuffer;
 import com.alipay.sofa.jraft.rhea.client.DefaultRheaKVStore;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
 import com.alipay.sofa.jraft.rhea.options.PlacementDriverOptions;
@@ -8,7 +9,17 @@ import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
 import com.alipay.sofa.jraft.rhea.options.configured.MultiRegionRouteTableOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
+import com.google.common.collect.Lists;
+import com.gudy.engine.bean.orderbook.GOrderBookImpl;
+import com.gudy.engine.bean.orderbook.IOrderBook;
 import com.gudy.engine.core.EngineApi;
+import com.gudy.engine.core.EngineCore;
+import com.gudy.engine.db.DbQuery;
+import com.gudy.engine.handler.BaseHandler;
+import com.gudy.engine.handler.match.StockMatchHandler;
+import com.gudy.engine.handler.pub.L1PubHandler;
+import com.gudy.engine.handler.risk.ExistRiskHandler;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
@@ -18,10 +29,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.dbutils.QueryRunner;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ShortObjectHashMap;
 import thirdpart.bean.CmdPack;
+import thirdpart.bus.IBusSender;
+import thirdpart.bus.MqttBusSender;
 import thirdpart.checksum.ICheckSum;
 import thirdpart.codec.IBodyCodec;
 import thirdpart.codec.IMsgCodec;
+import thirdpart.hq.MatchData;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -66,20 +83,65 @@ public class EngineConfig {
         initConfig();
 
         //2.数据库连接
-
+        initDB();
 
         //3.启动撮合核心
-
+        startEngine();
 
         //4.建立跟总线的连接
-
+        initPub();
 
         //5.初始化跟排队机的连接
         startSeqConn();
 
     }
+
     @Getter
-    private EngineApi engineApi = new EngineApi();
+    private IBusSender busSender;
+
+    private void initPub() {
+        busSender = new MqttBusSender(pubIp,pubPort,msgCodec,vertx);
+        busSender.startup();
+    }
+
+    private void startEngine() throws Exception {
+        //1.前置风控处理器
+        final BaseHandler riskHandler = new ExistRiskHandler(
+                db.queryAllBalance().keySet(),
+                db.queryAllStockCode()
+        );
+
+        //2.撮合处理器（订单簿*****）撮合/提供行情查询
+        IntObjectHashMap<IOrderBook> orderBookMap = new IntObjectHashMap<>();
+        db.queryAllStockCode().forEach(code -> orderBookMap.put(code,new GOrderBookImpl(code)));
+        final BaseHandler matchHandler = new StockMatchHandler(orderBookMap);
+
+        //3.行情发布系统
+        ShortObjectHashMap<List<MatchData>> matcherEventMap = new ShortObjectHashMap<>();
+        for(short id: db.queryAllMemberIds()){
+            matcherEventMap.put(id,Lists.newArrayList());
+        }
+
+        final BaseHandler pubHandler = new L1PubHandler(matcherEventMap,this);
+
+        engineApi = new EngineCore(
+            riskHandler,
+            matchHandler,
+            pubHandler
+        ).getApi();
+
+    }
+
+    private DbQuery db;
+
+    //数据库查询
+    private void initDB(){
+        QueryRunner runner = new QueryRunner(new ComboPooledDataSource());
+        db = new DbQuery(runner);
+    }
+
+    @Getter
+    private EngineApi engineApi;
 
     @Getter
     @ToString.Exclude
@@ -189,4 +251,5 @@ public class EngineConfig {
         log.info(this);
 
     }
+
 }
