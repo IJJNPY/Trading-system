@@ -4,6 +4,7 @@ import com.gudy.counter.bean.res.*;
 import com.gudy.counter.cache.StockCache;
 import com.gudy.counter.service.OrderService;
 import lombok.extern.log4j.Log4j2;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,6 +35,7 @@ public class OrderController {
     public CounterRes balanceQuery(@RequestParam long uid)
             throws Exception{
         long balance = orderService.getBalance(uid);
+        System.out.println(balance);
         return new CounterRes(balance);
     }
 
@@ -74,6 +76,17 @@ public class OrderController {
             return new CounterRes(CounterRes.SUCCESS,"save success",null);
         }else {
             return new CounterRes(CounterRes.FAIL,"save failed",null);
+        }
+    }
+
+    @RequestMapping("/cancelorder")
+    public CounterRes cancelOrder(@RequestParam int uid,
+                                  @RequestParam int counteroid,
+                                  @RequestParam int code){
+        if(orderService.cancelOrder(uid,counteroid,code)){
+            return new CounterRes(CounterRes.SUCCESS,"success", null);
+        }else {
+            return new CounterRes(CounterRes.FAIL,"failed",null);
         }
     }
 

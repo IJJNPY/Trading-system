@@ -17,6 +17,7 @@ import thirdpart.fetchsurv.IFetchService;
 import thirdpart.order.OrderCmd;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
 @Getter
@@ -43,12 +44,11 @@ public class GatewayConfig {
     private Vertx vertx = Vertx.vertx();
 
 
-    public void initConfig(String fileName)throws Exception{
+    public void initConfig(InputStream in)throws Exception{
 
         //创建dom4j解析器
         SAXReader reader = new SAXReader();
-        System.out.println(fileName);
-        Document document = reader.read(new File(fileName));
+        Document document = reader.read(in);
 
         Element root = document.getRootElement();
 

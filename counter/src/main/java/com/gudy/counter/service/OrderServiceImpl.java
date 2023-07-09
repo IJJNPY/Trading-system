@@ -5,6 +5,7 @@ import com.gudy.counter.bean.res.PosiInfo;
 import com.gudy.counter.bean.res.TradeInfo;
 import com.gudy.counter.config.CounterConfig;
 import com.gudy.counter.config.GatewayConn;
+import io.vertx.core.buffer.Buffer;
 import thirdpart.order.CmdType;
 import thirdpart.order.OrderCmd;
 import thirdpart.order.OrderDirection;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static com.gudy.counter.bean.MatchDataConsumer.ORDER_DATA_CACHE_ADDR;
 
 @Log4j2
 @Component
@@ -78,6 +81,18 @@ public class OrderServiceImpl implements OrderService {
             //2.生成全局ID 组装ID long[柜台ID，委托ID]
             orderCmd.oid = IDConverter.combineInt2Long(config.getId(),oid);
 
+            //保存委托到缓存
+            byte[] serialize = null;
+            try{
+                serialize = config.getBodyCodec().serialize(orderCmd);
+            }catch (Exception e){
+                log.error(e);
+            }
+            if(serialize == null){
+                return false;
+            }
+            config.getVertx().eventBus().send(ORDER_DATA_CACHE_ADDR, Buffer.buffer(serialize));
+
             //3.打包委托发送数据(ordercmd->网关模板类commonmsg->-tcp数据流)
             //4.发送
             gatewayConn.sendOrder(orderCmd);
@@ -85,5 +100,22 @@ public class OrderServiceImpl implements OrderService {
             return true;
         }
 
+    }
+
+    @Override
+    public boolean cancelOrder(int uid, int counteroid, int code) {
+
+        final OrderCmd orderCmd = OrderCmd.builder()
+                .uid(uid)
+                .code(code)
+                .type(CmdType.CANCEL_ORDER)
+                .oid(IDConverter.combineInt2Long(config.getId(),counteroid))
+                .build();
+
+        log.info("recv cancel order:{}", orderCmd);
+
+        gatewayConn.sendOrder(orderCmd);
+
+        return true;
     }
 }

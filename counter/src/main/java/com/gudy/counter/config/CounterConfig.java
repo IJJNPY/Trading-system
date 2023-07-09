@@ -1,5 +1,6 @@
 package com.gudy.counter.config;
 
+import com.gudy.counter.bean.MqttBusConsumer;
 import io.vertx.core.Vertx;
 import thirdpart.checksum.ICheckSum;
 import thirdpart.codec.IBodyCodec;
@@ -26,6 +27,17 @@ public class CounterConfig {
 
     @Value("${counter.workerId}")
     private long workerId;
+
+    ///////////websocket配置////////////////////
+    @Value("${counter.pubport}")
+    private int pubPort;
+
+    ///////////总线配置/////////////////////////
+    @Value("${counter.subbusip}")
+    private String subBusIp;
+
+    @Value("${counter.subbusport}")
+    private int subBusPort;
 
     ///////////网关配置/////////////////////////
     @Value("${counter.sendip}")
@@ -75,5 +87,9 @@ public class CounterConfig {
         } catch (Exception e) {
             log.error("init config error ", e);
         }
+        //初始化总线连接
+        new MqttBusConsumer(subBusIp,subBusPort,String.valueOf(id),msgCodec,cs,vertx).startup();
     }
+
+
 }

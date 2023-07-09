@@ -25,7 +25,7 @@ import static thirdpart.bean.MsgConstants.*;
 public class L1PubHandler extends BaseHandler {
 
     //向外广播行情，向柜台委托成交有变化的先推过去
-    public static final int HQ_PUB_RATE = 5000;
+    public static final int HQ_PUB_RATE = 1000;
 
     //存储发向柜台的数据
     @NonNull
@@ -40,9 +40,11 @@ public class L1PubHandler extends BaseHandler {
 
         if (cmdType == CmdType.NEW_ORDER || cmdType == CmdType.CANCEL_ORDER) {
             for (MatchEvent e : cmd.matchEventList) {
+                log.info(e);
                 matcherEventMap.get(e.mid).add(e.copy());
             }
         } else if (cmdType == CmdType.HQ_PUB) {
+//            log.info(cmd);
             //1.五档行情
             pubMarketData(cmd.marketDataMap);
             //2.给柜台发送MatchData

@@ -104,8 +104,8 @@ public class GOrderBucketImpl implements IOrderBucket{
 
         MatchEvent ofrEvent = new MatchEvent();
         ofrEvent.timestamp = now;
-        ofrEvent.mid = cmd.mid;
-        ofrEvent.oid = cmd.oid;
+        ofrEvent.mid = order.getMid();
+        ofrEvent.oid = order.getOid();
         ofrEvent.status = fullMatch? OrderStatus.TRADE_ED:OrderStatus.PART_TRADE;
         ofrEvent.tid = tid;
         ofrEvent.volume = traded;
@@ -135,18 +135,18 @@ public class GOrderBucketImpl implements IOrderBucket{
                 .toHashCode();
     }
 
-    @Override
-    public long getPrice() {
-        return 0;
-    }
-
-    @Override
-    public void setPrice(long price) {
-
-    }
-
-    @Override
-    public long getTotalVolume() {
-        return 0;
-    }
+//    @Override
+//    public long getPrice() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public void setPrice(long price) {
+//
+//    }
+//
+//    @Override
+//    public long getTotalVolume() {
+//        return 0;
+//    }
 }

@@ -50,44 +50,36 @@
 
 <script>
 
+    import {queryOrder, queryBalance, cancelOrder} from "../api/orderApi";
+    import {codeFormat, moneyFormat, directionFormat, statusFormat} from "../api/formatter";
+    import {constants} from "../api/constants";
+
     export default {
         name: "OrderList",
         data() {
             return {
-                tableData: [
-                    {
-                        time: '09:55:00',
-                        code: '000001',
-                        name: '平安银行',
-                        price: 100,
-                        ocount: 10,
-                        direction: '买入',
-                        status: 3
-                    },
-                    {
-                        time: '09:50:00',
-                        code: '000001',
-                        name: '平安银行',
-                        price: 100,
-                        ocount: 10,
-                        direction: '买入',
-                        status: 1
-                    },
-                    {
-                        time: '09:40:00',
-                        code: '000001',
-                        name: '平安银行',
-                        price: 100,
-                        ocount: 10,
-                        direction: '买入',
-                        status: 3
-                    }
-                ],
+                tableData: [],
                 query: {
                     currentPage: 1, // 当前页码
-                    pageSize: 2 // 每页的数据条数
+                    pageSize: 4 // 每页的数据条数
                 }
             };
+        },
+        computed: {
+          orderData() {
+            return this.$store.state.orderData;
+          },
+          dataTotalCount() {
+            return this.$store.state.orderData.length;
+          }
+        },
+        watch: {
+          orderData: function (val) {
+            this.tableData = val;
+          }
+        },
+        created() {
+          this.tableData = this.orderData;
         },
         methods: {
             isCancelBtnShow(status) {
@@ -97,6 +89,45 @@
                     return false;
                 }
             },
+            handleCancel(index, row) {
+              let message = (row.direction === constants.BUY ? "买入" : "卖出")
+                  + "     " + row.name + "(" + codeFormat(row.code) + ")    "
+                  + row.ocount + "股";
+              this.$confirm(message, '撤单', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                cancelOrder(
+                    {
+                      uid: sessionStorage.getItem("uid"),
+                      counteroid: row.id,
+                      code: row.code
+                    },
+                    undefined);
+              });
+
+            },
+            queryOrder() {
+              queryOrder();
+              queryBalance();
+            },
+            codeFormatter(row, column) {
+              return codeFormat(row.code);
+            },
+            priceFormatter(row, column) {
+              return moneyFormat(row.price);
+            },
+            directionFormatter(row, column) {
+              console.log(row);
+              return directionFormat(row.direction);
+            },
+            // 禁用状态格式化
+            statusFormatter(row, column) {
+              // 委托状态：// 0.已报  1.已成 2.部成 3.废单 4.已撤
+              return statusFormat(row.status);
+            },
+
             cellStyle({row, column, rowIndex, columnIndex}) {
                 return "padding:2px;";
             },

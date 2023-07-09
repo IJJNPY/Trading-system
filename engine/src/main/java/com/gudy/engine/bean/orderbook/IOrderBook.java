@@ -3,6 +3,7 @@ package com.gudy.engine.bean.orderbook;
 import com.gudy.engine.bean.command.CmdResultCode;
 import com.gudy.engine.bean.command.RbCmd;
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 import thirdpart.hq.L1MarketData;
 
 import static thirdpart.hq.L1MarketData.*;

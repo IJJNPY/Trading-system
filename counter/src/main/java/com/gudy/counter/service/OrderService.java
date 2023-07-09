@@ -19,4 +19,6 @@ public interface OrderService {
 
     boolean sendOrder(long uid,short type,long timestamp,
                       int code,byte direction,long price,long volume,byte ordertype);
+
+    boolean cancelOrder(int uid, int counteroid, int code);
 }

@@ -33,6 +33,7 @@ public class CmdPacketQueue {
     private final BlockingQueue<CmdPack> recvCache = new LinkedBlockingDeque<>();
 
     public void cache(CmdPack cmdPack){
+        log.info(cmdPack);
         recvCache.offer(cmdPack);
     }
 
@@ -98,6 +99,7 @@ public class CmdPacketQueue {
                 for(KVEntry entry:kvEntries){
                     byte[] value = entry.getValue();
                     if(ArrayUtils.isNotEmpty(value)){
+//                        log.info(codec.deserialize(value,CmdPack.class));
                         collect.add(codec.deserialize(value,CmdPack.class));
                     }
                 }
@@ -107,7 +109,8 @@ public class CmdPacketQueue {
                         continue;
                     }
                     for (OrderCmd cmd:pack.getOrderCmds()){
-                        log.info(cmd);
+//                        log.info(pack);
+//                        log.info(cmd);
                         engineApi.submitCommand(cmd);
                     }
                 }

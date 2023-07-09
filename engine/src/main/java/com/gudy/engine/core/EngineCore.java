@@ -68,7 +68,7 @@ public class EngineCore {
         log.info("match engine start");
 
         //4.定时发布行情任务
-        new Timer().schedule(new HqPubTask(),5000,HQ_PUB_RATE);
+        new Timer().schedule(new HqPubTask(),1000,HQ_PUB_RATE);
     }
 
     private class HqPubTask extends TimerTask{

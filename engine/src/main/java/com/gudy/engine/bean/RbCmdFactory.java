@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.gudy.engine.bean.command.CmdResultCode;
 import com.gudy.engine.bean.command.RbCmd;
 import com.lmax.disruptor.EventFactory;
+import lombok.extern.log4j.Log4j2;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 public class RbCmdFactory implements EventFactory<RbCmd> {

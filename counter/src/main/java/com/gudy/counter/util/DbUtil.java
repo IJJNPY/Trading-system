@@ -9,6 +9,7 @@ import com.gudy.counter.bean.res.PosiInfo;
 import com.gudy.counter.bean.res.TradeInfo;
 import com.gudy.counter.cache.CacheType;
 import com.gudy.counter.cache.RedisStringCache;
+import thirdpart.hq.MatchData;
 import thirdpart.order.OrderCmd;
 import thirdpart.order.OrderStatus;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,8 @@ public class DbUtil {
 
     @Autowired
     private SqlSessionTemplate sqlSessionTemplate;
+
+
 
     private void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate){
         this.sqlSessionTemplate = sqlSessionTemplate;
@@ -181,6 +184,15 @@ public class DbUtil {
         }
     }
 
+    public static void updateOrder(long uid, int oid, OrderStatus finalOrderStatus) {
+        Map<String, Object> param = Maps.newHashMap();
+        param.put("Id",oid);
+        param.put("Status", finalOrderStatus.getCode());
+        dbUtil.getSqlSessionTemplate().update("orderMapper.updateOrder",param);
+
+        RedisStringCache.remove(Long.toString(uid),CacheType.ORDER);
+    }
+
     //成交类
     public static List<TradeInfo> getTradeList(long uid){
         //1.查缓存
@@ -226,6 +238,27 @@ public class DbUtil {
         }else{
             return -1;
         }
+    }
+
+    public static void saveTrade(int counterOId, MatchData md, OrderCmd ordercmd) {
+        if(ordercmd == null){
+            return;
+        }
+        Map<String,Object> param = Maps.newHashMap();
+        param.put("Id",md.tid);
+        param.put("UId",ordercmd.uid);
+        param.put("Code",ordercmd.code);
+        param.put("Direction",ordercmd.direction.getDirection());
+        param.put("Price",md.price);
+        param.put("TCount",md.volume);
+        param.put("OId", counterOId);
+        param.put("Data",TimeformatUtil.yyyyMMdd(md.timestamp));
+        param.put("Time",TimeformatUtil.hhMMss(md.timestamp));
+
+        dbUtil.getSqlSessionTemplate().insert("orderMapper.saveTrade",param);
+
+        //更新缓存
+        RedisStringCache.remove(Long.toString(ordercmd.uid),CacheType.TRADE);
     }
 
     //股票信息查询

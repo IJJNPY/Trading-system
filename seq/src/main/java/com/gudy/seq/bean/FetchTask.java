@@ -78,8 +78,6 @@ public class FetchTask extends TimerTask {
 
             //3.更新packetno+1
             updatePacketNoInstore(packetNo + 1);
-            log.info(serialize);
-            log.info(config.getNode().getRheaKVStore());
 
             //4.发送
             config.getMulticastSender().send(
@@ -88,7 +86,6 @@ public class FetchTask extends TimerTask {
                     config.getMulticastIp(),
                     null
             );
-            log.info("5");
 
 
         } catch (Exception e) {

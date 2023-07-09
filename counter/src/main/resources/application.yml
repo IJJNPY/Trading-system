@@ -38,6 +38,13 @@ counter:
   sendip: 127.0.0.1
   sendport: 8082
 
+  #订阅总线数据
+  subbusip: 127.0.0.1
+  subbusport: 1883
+
+  #委托终端通信
+  pubport: 8501
+
   #编码解码器
   checksum: thirdpart.checksum.ByteCheckSum
   bodycodec: thirdpart.codec.BodyCodec

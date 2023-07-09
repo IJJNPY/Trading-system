@@ -61,6 +61,10 @@
             direction: {type: Number, required: true},
         },
         methods: {
+            queryRefresh(){
+              queryPosi();
+              queryBalance();
+            },
             handlePrice(){
               if(this.direction === constants.SELL){
                 let posiArr = this.$store.state.posiData;
@@ -109,8 +113,11 @@
                 volume: this.volume,
                 ordertype: constants.LIMIT
               },this.handleOrderRes)
+              console.log(this.$store.state.balanceData)
               PosiList.methods.queryRefresh()
+              console.log(this.$store.state.balanceData)
               this.handlePrice()
+              console.log("3")
             }
 
         },
